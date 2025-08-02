@@ -139,7 +139,7 @@
         document.querySelectorAll(".button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
         currentNumber = numStr;
-        audioPlayer.src = `sounds/$\{fileMap[numStr]}`;
+        audioPlayer.src = `sounds/${fileMap[numStr]}`;
         audioPlayer.play();
         showAnswer.style.display = "inline-block";
         displayArea.innerHTML = "";
@@ -150,7 +150,7 @@
     showAnswer.addEventListener("click", () => {
       if (currentNumber) {
         const img = document.createElement("img");
-        img.src = `images/$\{currentNumber}.jpg`;
+       img.src = `images/${currentNumber}.jpg`;
         img.alt = "動物の写真";
         img.className = "photo";
         displayArea.innerHTML = "";
