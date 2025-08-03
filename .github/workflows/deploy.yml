@@ -23,8 +23,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v1  # ← これが正しい！
-
+        uses: actions/upload-pages-artifact@v1  # ← ココが超重要！！
         with:
           path: .
 
