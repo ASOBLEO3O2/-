@@ -83,7 +83,7 @@
   <div class="display-area" id="displayArea"></div>
 
   <script>
-    const BASE_URL = location.pathname.replace(/\/$/, "");
+    const BASE_URL = "/ASOBLE0302"; // GitHub Pages のルート名に合わせて変更！
 
     const buttonContainer = document.getElementById("buttonContainer");
     const audioPlayer = document.getElementById("audioPlayer");
@@ -116,9 +116,7 @@
         button.classList.add("active");
 
         currentNumber = numStr;
-
-        const audioFile = fileMap[numStr];
-        const audioPath = `${BASE_URL}/音声/${encodeURIComponent(audioFile)}`;
+        const audioPath = `${BASE_URL}/sounds/${encodeURIComponent(fileMap[numStr])}`;
         audioPlayer.src = audioPath;
         audioPlayer.play();
 
@@ -136,7 +134,7 @@
 
     showAnswer.addEventListener("click", () => {
       if (currentNumber) {
-        const imagePath = `${BASE_URL}/動物の画像/${encodeURIComponent(currentNumber)}.jpg`;
+        const imagePath = `${BASE_URL}/images/${currentNumber}.jpg`;
         const img = document.createElement("img");
         img.src = imagePath;
         img.alt = `${currentNumber}番の動物の写真`;
