@@ -113,117 +113,122 @@
     <button id="nextButton" class="button">つぎのなきごえをきく</button>
   </div>
 
-  <script>
-    const audio = document.getElementById("audio");
-    const popup = document.getElementById("popup");
-    const animalImage = document.getElementById("animalImage");
-    const animalName = document.getElementById("animalName");
-    const nextButton = document.getElementById("nextButton");
-    const replayButton = document.getElementById("replayButton");
-    const showAnswerButton = document.getElementById("showAnswerButton");
-    const container = document.getElementById("buttonContainer");
+<script>
+  const audio = document.getElementById("audio");
+  const popup = document.getElementById("popup");
+  const animalImage = document.getElementById("animalImage");
+  const animalName = document.getElementById("animalName");
+  const nextButton = document.getElementById("nextButton");
+  const replayButton = document.getElementById("replayButton");
+  const showAnswerButton = document.getElementById("showAnswerButton");
+  const container = document.getElementById("buttonContainer");
 
-    const animals = {
-      "01": "ロバ", "02": "コオロギ", "03": "カバ", "04": "ミサゴ", "05": "カモメ",
-      "06": "リス", "07": "バッタ", "08": "キツネ", "09": "カエル", "10": "ヘラジカ",
-      "11": "ハト", "12": "マネシツグミ", "13": "クジャク", "14": "カバ", "15": "フラミンゴ",
-      "16": "カラス", "17": "カナリア", "18": "フクロウ", "19": "ネコ", "20": "バチ",
-      "21": "ネコ", "22": "モンキー", "23": "ペンギン", "24": "アカオウム", "25": "ヒツジ",
-      "26": "ウマ", "27": "アヒル", "28": "ヤギ", "29": "ウシ", "30": "ニワトリ",
-      "31": "ブラッドハウンド", "32": "クマ", "33": "ブタ", "34": "カンガルー", "35": "コヨーテ",
-      "36": "バッファロー", "37": "ホッキョクグマ", "38": "ピューマ", "39": "トラ", "40": "チンパンジー",
-      "41": "ワニ", "42": "ゴリラ", "43": "コブラ", "44": "ヒョウ", "45": "ゾウ",
-      "46": "バイソン", "47": "オオカミ", "48": "ハゲワシ", "49": "ガラガラヘビ", "50": "ライオン"
-    };
+  const animals = {
+    "01": "ロバ", "02": "コオロギ", "03": "カバ", "04": "ミサゴ", "05": "カモメ",
+    "06": "リス", "07": "バッタ", "08": "キツネ", "09": "カエル", "10": "ヘラジカ",
+    "11": "ハト", "12": "マネシツグミ", "13": "クジャク", "14": "カバ", "15": "フラミンゴ",
+    "16": "カラス", "17": "カナリア", "18": "フクロウ", "19": "ネコ", "20": "バチ",
+    "21": "ネコ", "22": "モンキー", "23": "ペンギン", "24": "アカオウム", "25": "ヒツジ",
+    "26": "ウマ", "27": "アヒル", "28": "ヤギ", "29": "ウシ", "30": "ニワトリ",
+    "31": "ブラッドハウンド", "32": "クマ", "33": "ブタ", "34": "カンガルー", "35": "コヨーテ",
+    "36": "バッファロー", "37": "ホッキョクグマ", "38": "ピューマ", "39": "トラ", "40": "チンパンジー",
+    "41": "ワニ", "42": "ゴリラ", "43": "コブラ", "44": "ヒョウ", "45": "ゾウ",
+    "46": "バイソン", "47": "オオカミ", "48": "ハゲワシ", "49": "ガラガラヘビ", "50": "ライオン"
+  };
 
-    let currentNum = null;
+  let currentNum = null;
 
-    for (let i = 1; i <= 50; i++) {
-      const num = String(i).padStart(2, "0");
-      const btn = document.createElement("button");
-      btn.textContent = num;
-      btn.className = "button";
-      btn.addEventListener("click", () => playSound(num, btn));
-      container.appendChild(btn);
-    }
+  for (let i = 1; i <= 50; i++) {
+    const num = String(i).padStart(2, "0");
+    const btn = document.createElement("button");
+    btn.textContent = num;
+    btn.className = "button";
+    btn.addEventListener("click", () => playSound(num, btn));
+    container.appendChild(btn);
+  }
 
-    function playSound(num, btn) {
-      currentNum = num;
-      const name = animals[num] || "どうぶつ";
-      const encodedName = encodeURIComponent(name);
+  function playSound(num, btn) {
+    currentNum = num;
+    const name = animals[num] || "どうぶつ";
+    const encodedName = encodeURIComponent(name); // ← 追加
 
-      audio.src = `sounds/${num}_${encodedName}.mp3`;
-      audio.play();
+    audio.src = `sounds/${num}_${encodedName}.mp3`;
+    audio.play();
 
-      document.querySelectorAll(".button").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+    document.querySelectorAll(".button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
 
-      popup.style.display = "none";
-      animalImage.style.display = "none";
-      animalName.style.display = "none";
-      nextButton.style.display = "none";
+    popup.style.display = "none";
+    animalImage.style.display = "none";
+    animalName.style.display = "none";
+    nextButton.style.display = "none";
+    animalName.classList.remove("blink");
+    clearEffects();
+
+    setTimeout(() => {
+      showPopup();
+    }, 2000);
+  }
+
+  function showPopup() {
+    popup.style.display = "flex";
+  }
+
+  replayButton.addEventListener("click", () => {
+    const name = animals[currentNum] || "どうぶつ";
+    const encodedName = encodeURIComponent(name); // ← 追加
+    audio.src = `sounds/${currentNum}_${encodedName}.mp3`;
+    audio.play();
+  });
+
+  showAnswerButton.addEventListener("click", () => {
+    const name = animals[currentNum] || "どうぶつ";
+    const encodedName = encodeURIComponent(name); // ← 追加
+
+    animalImage.src = `images/${currentNum}_${encodedName}.jpg`;
+    animalImage.style.display = "block";
+    animalImage.classList.add("grow");
+
+    animalImage.addEventListener("animationend", () => {
+      animalImage.classList.remove("grow");
+    }, { once: true });
+
+    animalName.textContent = name;
+    animalName.style.display = "block";
+    animalName.classList.add("blink");
+
+    setTimeout(() => {
       animalName.classList.remove("blink");
-      clearEffects();
+      nextButton.style.display = "block";
+    }, 2000);
 
-      setTimeout(() => {
-        showPopup();
-      }, 2000);
+    sparkleEffect();
+  });
+
+  nextButton.addEventListener("click", () => {
+    popup.style.display = "none";
+    animalName.textContent = "";
+    animalName.style.display = "none";
+    animalImage.style.display = "none";
+    nextButton.style.display = "none";
+    clearEffects();
+  });
+
+  function sparkleEffect() {
+    for (let i = 0; i < 50; i++) {
+      const dot = document.createElement("div");
+      dot.className = "effect";
+      dot.style.left = `${Math.random() * window.innerWidth}px`;
+      dot.style.top = `${Math.random() * window.innerHeight}px`;
+      document.body.appendChild(dot);
+      setTimeout(() => dot.remove(), 1200);
     }
+  }
 
-    function showPopup() {
-      popup.style.display = "flex";
-    }
-
-    replayButton.addEventListener("click", () => {
-      const name = animals[currentNum] || "どうぶつ";
-      const encodedName = encodeURIComponent(name);
-      audio.src = `sounds/${currentNum}_${encodedName}.mp3`;
-      audio.play();
-    });
-
-    showAnswerButton.addEventListener("click", () => {
-      const name = animals[currentNum] || "どうぶつ";
-      const encodedName = encodeURIComponent(name);
-
-      animalImage.src = `images/${currentNum}_${encodedName}.jpg`;
-      animalImage.style.display = "block";
-
-      animalName.textContent = name;
-      animalName.style.display = "block";
-      animalName.classList.add("blink");
-
-      setTimeout(() => {
-        animalName.classList.remove("blink");
-        nextButton.style.display = "block";
-      }, 2000);
-
-      sparkleEffect();
-    });
-
-    nextButton.addEventListener("click", () => {
-      popup.style.display = "none";
-      animalName.textContent = "";
-      animalName.style.display = "none";
-      animalImage.style.display = "none";
-      nextButton.style.display = "none";
-      clearEffects();
-    });
-
-    function sparkleEffect() {
-      for (let i = 0; i < 50; i++) {
-        const dot = document.createElement("div");
-        dot.className = "effect";
-        dot.style.left = `${Math.random() * window.innerWidth}px`;
-        dot.style.top = `${Math.random() * window.innerHeight}px`;
-        document.body.appendChild(dot);
-        setTimeout(() => dot.remove(), 1200);
-      }
-    }
-
-    function clearEffects() {
-      document.querySelectorAll(".effect").forEach(e => e.remove());
-    }
-  </script>
+  function clearEffects() {
+    document.querySelectorAll(".effect").forEach(e => e.remove());
+  }
+</script>
 
 </body>
 </html>
