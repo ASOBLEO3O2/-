@@ -150,13 +150,14 @@
     function playSound(num, btn) {
       currentNum = num;
       const name = animals[num] || "どうぶつ";
-      audio.src = `sounds/${num}_${name}.mp3`;
+      const encodedName = encodeURIComponent(name);
+
+      audio.src = `sounds/${num}_${encodedName}.mp3`;
       audio.play();
 
       document.querySelectorAll(".button").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
-      // 初期化
       popup.style.display = "none";
       animalImage.style.display = "none";
       animalName.style.display = "none";
@@ -175,13 +176,16 @@
 
     replayButton.addEventListener("click", () => {
       const name = animals[currentNum] || "どうぶつ";
-      audio.src = `sounds/${currentNum}_${name}.mp3`;
+      const encodedName = encodeURIComponent(name);
+      audio.src = `sounds/${currentNum}_${encodedName}.mp3`;
       audio.play();
     });
 
     showAnswerButton.addEventListener("click", () => {
       const name = animals[currentNum] || "どうぶつ";
-      animalImage.src = `images/${currentNum}_${name}.jpg`;
+      const encodedName = encodeURIComponent(name);
+
+      animalImage.src = `images/${currentNum}_${encodedName}.jpg`;
       animalImage.style.display = "block";
 
       animalName.textContent = name;
