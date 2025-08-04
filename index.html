@@ -2,152 +2,111 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASOBLEなきごえはんと</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: sans-serif;
       text-align: center;
-      background-color: #fff6e6;
-      margin: 0;
-      padding: 20px;
+      background-color: #fff;
+      color: #333;
     }
     h1 {
-      color: #d33;
-      margin-bottom: 30px;
+      margin-top: 30px;
     }
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-    .buttons button {
-      width: 50px;
-      height: 50px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background-color: #f4b400;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .buttons button:hover {
-      background-color: #db9e00;
-    }
-    .controls {
-      margin-top: 20px;
-    }
-    .answerArea {
-      margin-top: 20px;
-      display: none;
-    }
-    .answerImage {
-      max-width: 300px;
-      margin-top: 10px;
-    }
-    .hidden {
-      display: none;
-    }
-    .action-buttons {
-      margin-top: 15px;
-    }
-    .action-buttons button {
+    .button {
+      margin: 10px;
       padding: 10px 20px;
-      margin: 0 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: 6px;
-      background-color: #4caf50;
-      color: white;
-      cursor: pointer;
+      font-size: 20px;
     }
-    .action-buttons button:hover {
-      background-color: #3c8c3f;
+    #answerArea {
+      margin-top: 20px;
+    }
+    #answerImage {
+      width: 300px;
+      max-width: 80%;
     }
   </style>
 </head>
 <body>
-
   <h1>ASOBLEなきごえはんと</h1>
-  
-  <div class="buttons" id="soundButtons">
-    <!-- ボタンが自動生成されます -->
-  </div>
+  <audio id="audioPlayer" controls></audio><br />
+  <button id="replayBtn" class="button">もういちどきく</button>
+  <button id="answerBtn" class="button">こたえをみる</button>
 
-  <div class="controls">
-    <audio id="audioPlayer" controls></audio>
-    <div class="action-buttons hidden" id="actionButtons">
-      <button onclick="replay()">もういちどきく</button>
-      <button onclick="showAnswer()">こたえをみる</button>
-    </div>
-  </div>
-
-  <div class="answerArea" id="answerArea">
-    <p id="answerName"></p>
-    <img id="answerImage" class="answerImage" src="" alt=""/>
+  <div id="answerArea" style="display: none;">
+    <p id="answerText"></p>
+    <img id="answerImage" src="" alt="" />
   </div>
 
   <script>
+    const audioPlayer = document.getElementById("audioPlayer");
+    const replayBtn = document.getElementById("replayBtn");
+    const answerBtn = document.getElementById("answerBtn");
+    const answerArea = document.getElementById("answerArea");
+    const answerText = document.getElementById("answerText");
+    const answerImage = document.getElementById("answerImage");
+
+    let currentId = "01";
+
     const animalMap = {
-      "01": "ロバ", "02": "コオロギ", "03": "カバ", "04": "ミサゴ", "05": "カモメ", "06": "リス", "07": "バッタ", "08": "キツネ",
-      "09": "カエル", "10": "ヘラジカ", "11": "ハト", "12": "マネシツグミ", "13": "ジャク", "14": "フィンチ", "15": "フラミンゴ",
-      "16": "カラス", "17": "カナリア", "18": "フクロウ", "19": "スズメ", "20": "ハチ", "21": "ネコ", "22": "モンキー",
-      "23": "ペンギン", "24": "アカオウム", "25": "ヒツジ", "26": "ウマ", "27": "アヒル", "28": "ヤギ", "29": "シシ",
-      "30": "ニワトリ", "31": "ブラッドハウンド", "32": "ヤギ", "33": "ブタ", "34": "カンガルー", "35": "コヨーテ",
-      "36": "バッファロー", "37": "ホッキョクグマ", "38": "ピューマ", "39": "トラ", "40": "チンパンジー", "41": "ワニ",
-      "42": "ゴリラ", "43": "コブラ", "44": "ヒョウ", "45": "ゾウ", "46": "パイソン", "47": "オオカミ", "48": "ハクサン",
+      "01": "ロバ", "02": "コロナギ", "03": "カバ", "04": "ミサゴ", "05": "カモメ",
+      "06": "リス", "07": "バッタ", "08": "キツネ", "09": "カエル", "10": "ヘラジカ",
+      "11": "ハト", "12": "マネシツグミ", "13": "ジャク", "14": "フィンチ", "15": "フラミンゴ",
+      "16": "カラス", "17": "カナリア", "18": "フクロウ", "19": "スズメ", "20": "ハチ",
+      "21": "ネコ", "22": "モンキー", "23": "ペンギン", "24": "フカオウム", "25": "ヒツジ",
+      "26": "ウマ", "27": "アヒル", "28": "ヤギ", "29": "シシ", "30": "ニワトリ",
+      "31": "ブラッドハウンド", "32": "ヤギ", "33": "ブタ", "34": "カンガルー",
+      "35": "コヨーテ", "36": "バッファロー", "37": "ホッキョクグマ", "38": "ピューマ",
+      "39": "トラ", "40": "チンパンジー", "41": "ワニ", "42": "ゴリラ", "43": "コブラ",
+      "44": "ヒョウ", "45": "ゾウ", "46": "パイソン", "47": "オオカミ", "48": "ハウンド",
       "49": "ガラガラヘビ", "50": "サイ"
     };
 
-    const audioPlayer = document.getElementById("audioPlayer");
-    const actionButtons = document.getElementById("actionButtons");
-    const answerArea = document.getElementById("answerArea");
-    const answerImage = document.getElementById("answerImage");
-    const answerName = document.getElementById("answerName");
-
-    let currentId = "";
-
-    function createButtons() {
-      const container = document.getElementById("soundButtons");
-      for (let i = 1; i <= 50; i++) {
-        const id = String(i).padStart(2, "0");
-        const btn = document.createElement("button");
-        btn.textContent = id;
-        btn.onclick = () => playSound(id);
-        container.appendChild(btn);
-      }
-    }
-
     function playSound(id) {
       currentId = id;
-      const soundPath = `sounds/${id}_${animalMap[id]}.mp3`;
+      const name = animalMap[id];
+      const soundPath = `sounds/${id}_${name}.mp3`;
       audioPlayer.src = soundPath;
       audioPlayer.play();
 
-      actionButtons.classList.add("hidden");
+      // ボタン非表示 → 2秒後表示
+      replayBtn.style.display = "none";
+      answerBtn.style.display = "none";
       answerArea.style.display = "none";
 
       setTimeout(() => {
-        actionButtons.classList.remove("hidden");
+        replayBtn.style.display = "inline-block";
+        answerBtn.style.display = "inline-block";
       }, 2000);
     }
 
-    function replay() {
-      audioPlayer.currentTime = 0;
-      audioPlayer.play();
-    }
-
     function showAnswer() {
-      const imgPath = `images/${currentId}_${animalMap[currentId]}.jpg`;
-      answerImage.src = imgPath;
-      answerName.textContent = `こたえ：${animalMap[currentId]}`;
-      answerArea.style.display = "block";
+      const name = animalMap[currentId];
+      const basePath = `images/${currentId}_${name}`;
+      const tryExts = [".jpg", ".jpeg"];
+
+      // 画像を順に試す
+      (async () => {
+        for (const ext of tryExts) {
+          const path = basePath + ext;
+          try {
+            const res = await fetch(path);
+            if (res.ok) {
+              answerImage.src = path;
+              break;
+            }
+          } catch (e) {}
+        }
+        answerText.textContent = `こたえ：${name}`;
+        answerArea.style.display = "block";
+      })();
     }
 
-    createButtons();
+    // 最初の音を設定
+    window.onload = () => playSound(currentId);
+    replayBtn.onclick = () => playSound(currentId);
+    answerBtn.onclick = showAnswer;
   </script>
 </body>
 </html>
