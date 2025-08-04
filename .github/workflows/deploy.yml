@@ -23,7 +23,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v1  # ← ココ！
+        uses: actions/upload-pages-artifact@v2  # ← ココ！
         with:
           path: .
 
