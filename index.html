@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ASOBLEなきごえはんと</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Cherry Bomb One', cursive;
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      text-align: center;
+    }
+    h1 {
+      color: red;
+      font-size: 48px;
+      margin-top: 20px;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px;
+    }
+    .button {
+      font-family: 'Cherry Bomb One', cursive;
+      font-size: 32px;
+      padding: 20px 30px;
+      border-radius: 12px;
+      background-color: #f8c74c;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .button:hover, .button.active {
+      background-color: #f59542;
+      transform: scale(1.1);
+    }
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.95);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      z-index: 999;
+      color: black;
+      font-family: 'Cherry Bomb One', cursive;
+    }
+    #popup img {
+      width: 90vw;
+      max-width: 500px;
+      border-radius: 20px;
+      display: none;
+    }
+    #animalName {
+      font-size: 40px;
+      margin-top: 10px;
+      color: red;
+      display: none;
+    }
+    .blink {
+      animation: blink 0.5s steps(2, start) 4;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    #nextButton {
+      margin-top: 20px;
+      font-size: 24px;
+      padding: 10px 20px;
+      display: none;
+    }
+    .effect {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: yellow;
+      border-radius: 50%;
+      animation: sparkle 1.2s ease-out forwards;
+    }
+    @keyframes sparkle {
+      to {
+        transform: translateY(-100px) scale(0);
+        opacity: 0;
+      }
+    }
+    @keyframes grow {
+      0% { transform: scale(0.2); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .grow {
+      animation: grow 0.8s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>ASOBLEなきごえはんと</h1>
+  <div class="container" id="buttonContainer"></div>
+  <audio id="audio" style="display:none;"></audio>
+  <div id="popup">
+    <img id="animalImage" src="" alt="動物画像">
+    <div id="animalName"></div>
+    <button id="replayButton" class="button">もういちどきく</button>
+    <button id="showAnswerButton" class="button">こたえをみる</button>
+    <button id="nextButton" class="button">つぎのなきごえをきく</button>
+  </div>
+  <script>
+    const audio = document.getElementById("audio");
+    const popup = document.getElementById("popup");
+    const animalImage = document.getElementById("animalImage");
+    const animalName = document.getElementById("animalName");
+    const nextButton = document.getElementById("nextButton");
+    const replayButton = document.getElementById("replayButton");
+    const showAnswerButton = document.getElementById("showAnswerButton");
+    const container = document.getElementById("buttonContainer");
+
+    const animals = {
+      "01": { jp: "ロバ", romaji: "roba" }, "02": { jp: "コオロギ", romaji: "koorogi" },
+      "03": { jp: "カバ", romaji: "kaba" }, "04": { jp: "ミサゴ", romaji: "misago" },
+      "05": { jp: "カモメ", romaji: "kamome" }, "06": { jp: "リス", romaji: "risu" },
+      "07": { jp: "バッタ", romaji: "batta" }, "08": { jp: "キツネ", romaji: "kitsune" },
+      "09": { jp: "カエル", romaji: "kaeru" }, "10": { jp: "ヘラジカ", romaji: "herajika" },
+      "11": { jp: "ハト", romaji: "hato" }, "12": { jp: "マネシツグミ", romaji: "maneshitsugumi" },
+      "13": { jp: "クジャク", romaji: "kujaku" }, "14": { jp: "カバ", romaji: "kaba" },
+      "15": { jp: "フラミンゴ", romaji: "furamingo" }, "16": { jp: "カラス", romaji: "karasu" },
+      "17": { jp: "カナリア", romaji: "kanaria" }, "18": { jp: "フクロウ", romaji: "fukurou" },
+      "19": { jp: "ネコ", romaji: "neko" }, "20": { jp: "バチ", romaji: "bachi" },
+      "21": { jp: "ネコ", romaji: "neko" }, "22": { jp: "モンキー", romaji: "monkii" },
+      "23": { jp: "ペンギン", romaji: "pengin" }, "24": { jp: "アカオウム", romaji: "akaoumu" },
+      "25": { jp: "ヒツジ", romaji: "hitsuji" }, "26": { jp: "ウマ", romaji: "uma" },
+      "27": { jp: "アヒル", romaji: "ahiru" }, "28": { jp: "ヤギ", romaji: "yagi" },
+      "29": { jp: "ウシ", romaji: "ushi" }, "30": { jp: "ニワトリ", romaji: "niwatori" },
+      "31": { jp: "ブラッドハウンド", romaji: "buraddohaundo" }, "32": { jp: "クマ", romaji: "kuma" },
+      "33": { jp: "ブタ", romaji: "buta" }, "34": { jp: "カンガルー", romaji: "kangaruu" },
+      "35": { jp: "コヨーテ", romaji: "koyote" }, "36": { jp: "バッファロー", romaji: "baffarou" },
+      "37": { jp: "ホッキョクグマ", romaji: "hokkyokuguma" }, "38": { jp: "ピューマ", romaji: "pyuuma" },
+      "39": { jp: "トラ", romaji: "tora" }, "40": { jp: "チンパンジー", romaji: "chinpanjii" },
+      "41": { jp: "ワニ", romaji: "wani" }, "42": { jp: "ゴリラ", romaji: "gorira" },
+      "43": { jp: "コブラ", romaji: "kobura" }, "44": { jp: "ヒョウ", romaji: "hyou" },
+      "45": { jp: "ゾウ", romaji: "zou" }, "46": { jp: "バイソン", romaji: "baison" },
+      "47": { jp: "オオカミ", romaji: "ookami" }, "48": { jp: "ハゲワシ", romaji: "hagewashi" },
+      "49": { jp: "ガラガラヘビ", romaji: "garagarabi" }, "50": { jp: "ライオン", romaji: "raion" }
+    };
+
+    let currentNum = null;
+
+    for (let i = 1; i <= 50; i++) {
+      const num = String(i).padStart(2, "0");
+      const btn = document.createElement("button");
+      btn.textContent = num;
+      btn.className = "button";
+      btn.addEventListener("click", () => playSound(num, btn));
+      container.appendChild(btn);
+    }
+
+    function playSound(num, btn) {
+      currentNum = num;
+      const { jp, romaji } = animals[num];
+      audio.src = `sounds/${num}_${romaji}.mp3`;
+      audio.play();
+
+      document.querySelectorAll(".button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      popup.style.display = "none";
+      animalImage.style.display = "none";
+      animalName.style.display = "none";
+      nextButton.style.display = "none";
+      animalName.classList.remove("blink");
+      clearEffects();
+
+      setTimeout(() => {
+        popup.style.display = "flex";
+      }, 2000);
+    }
+
+    replayButton.addEventListener("click", () => {
+      const { romaji } = animals[currentNum];
+      audio.src = `sounds/${currentNum}_${romaji}.mp3`;
+      audio.play();
+    });
+
+    showAnswerButton.addEventListener("click", () => {
+      const { jp, romaji } = animals[currentNum];
+      animalImage.src = `images/${currentNum}_${romaji}.jpg`;
+      animalImage.style.display = "block";
+      animalImage.classList.add("grow");
+      animalImage.addEventListener("animationend", () => {
+        animalImage.classList.remove("grow");
+      }, { once: true });
+
+      animalName.textContent = jp;
+      animalName.style.display = "block";
+      animalName.classList.add("blink");
+
+      setTimeout(() => {
+        animalName.classList.remove("blink");
+        nextButton.style.display = "block";
+      }, 2000);
+
+      sparkleEffect();
+    });
+
+    nextButton.addEventListener("click", () => {
+      popup.style.display = "none";
+      animalName.textContent = "";
+      animalName.style.display = "none";
+      animalImage.style.display = "none";
+      nextButton.style.display = "none";
+      clearEffects();
+    });
+
+    function sparkleEffect() {
+      for (let i = 0; i < 50; i++) {
+        const dot = document.createElement("div");
+        dot.className = "effect";
+        dot.style.left = `${Math.random() * window.innerWidth}px`;
+        dot.style.top = `${Math.random() * window.innerHeight}px`;
+        document.body.appendChild(dot);
+        setTimeout(() => dot.remove(), 1200);
+      }
+    }
+
+    function clearEffects() {
+      document.querySelectorAll(".effect").forEach(e => e.remove());
+    }
+  </script>
+</body>
+</html>
